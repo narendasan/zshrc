@@ -1,0 +1,99 @@
+# ZPLUG
+if [[ ! -d ~/.zplug ]];then
+    git clone https://github.com/b4b4r07/zplug ~/.zplug
+fi
+
+source ~/.zplug/init.zsh
+zplug ‘zplug/zplug’, hook-build:‘zplug --self-manage’
+#zplug “yous/vanilli.sh”
+# Async for zsh, used by pure
+zplug “mafredri/zsh-async”, from:github, defer:0
+# Load completion library for those sweet [tab] squares
+zplug “lib/completion”, from:oh-my-zsh
+
+zplug “zsh-users/zsh-history-substring-search”
+
+zplug “plugins/git”,   from:oh-my-zsh
+
+zplug “lib/clipboard”, from:oh-my-zsh, if:“[[ $OSTYPE == *darwin* ]]”
+
+zplug “rimraf/k”
+#zplug “b4b4r07/enhancd”, use:init.sh
+zplug ‘plugins/git-prune’, from:oh-my-zsh
+#zplug “AlexisBRENON/oh-my-zsh-reminder”
+zplug “RobertAudi/tsm”
+zplug “gko/ssh-connect”
+
+zplug “molovo/revolver”, \
+      as:command, \
+      use:revolver
+
+zplug “stedolan/jq”, \
+      from:gh-r, \
+      as:command, \
+      rename-to:jq
+zplug “b4b4r07/emoji-cli”, \
+      on:“stedolan/jq”
+
+zplug “uvaes/fzf-marks”
+
+# Syntax highlighting for commands, load last
+#zplug “themes/agnoster”, from:oh-my-zsh, as:theme
+#zplug “NelsonBrandao/absolute”, as:theme
+#zplug “eendroroy/alien-minimal”, as:theme
+#zplug “stanleysq/aplos”, as:theme
+#zplug “eli-oat/bashi”, from:github, as:theme
+setopt prompt_subst # Make sure prompt is able to be generated properly.
+#zplug “caiogondim/bullet-train.zsh”, use:bullet-train.zsh-theme, defer:3
+#zplug “cusxio/delta-prompt”, use:delta.zsh
+#zplug “molovo/filthy”, as:theme
+#zplug “geometry-zsh/geometry”
+#zplug “subnixr/minimal”
+#zplug “LasaleFamine/phi-zsh-theme”
+
+#zplug “denysdovhan/spaceship-zsh-theme”, use:spaceship.zsh, from:github, as:theme
+zplug mafredri/zsh-async, from:github
+#zplug sindresorhus/pure, use:pure.zsh, from:github, as:theme
+
+zplug “geometry-zsh/geometry”
+
+#zplug carloscuesta/materialshell, use:materialshell, from:github, as:theme
+zplug “zsh-users/zsh-syntax-highlighting”, from:github, defer:3
+# Theme!
+#zplug “sindresorhus/pure”, use:pure.zsh, from:github, as:theme
+
+if ! zplug check --verbose; then
+    printf “Install? [y/N]: ”
+    if read -q; then
+        echo; zplug install
+    fi
+fi
+
+# Then, source plugins and add commands to $PATH
+zplug load
+
+
+# User configuration
+. ~/.dotfiles/scripts/env.sh
+source ~/.profile
+
+export NVM_DIR=“$HOME/.nvm”
+[ -s “$NVM_DIR/nvm.sh” ] && \. “$NVM_DIR/nvm.sh”  # This loads nvm
+[ -s “$NVM_DIR/bash_completion” ] && \. “$NVM_DIR/bash_completion”  # This loads nvm bash_completion
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+export PATH=“$HOME/.rbenv/bin:$PATH”
+eval “$(rbenv init -)”
+
+# added by Miniconda3 installer
+export PATH=“/Users/naren/Developer/tezos:/Users/naren/.miniconda3/bin:$PATH”
+
+# tabtab source for electron-forge package
+# uninstall by removing these lines or running `tabtab uninstall electron-forge`
+[[ -f /Users/naren/Developer/js/ipfs-desktop/node_modules/tabtab/.completions/electron-forge.zsh ]] && . /Users/naren/Developer/js/ipfs-desktop/node_modules/tabtab/.completions/electron-forge.zsh
+
+work() {
+   sshfs $WORK:Developer ~/Work/Developer
+   ssh -XC $WORK
+}
