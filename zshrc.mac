@@ -4,63 +4,166 @@ if [[ ! -d ~/.zplug ]];then
 fi
 
 source ~/.zplug/init.zsh
-zplug ‘zplug/zplug’, hook-build:‘zplug --self-manage’
-#zplug “yous/vanilli.sh”
-# Async for zsh, used by pure
-zplug “mafredri/zsh-async”, from:github, defer:0
-# Load completion library for those sweet [tab] squares
-zplug “lib/completion”, from:oh-my-zsh
 
-zplug “zsh-users/zsh-history-substring-search”
+# Make sure to use double quotes
+zplug "zsh-users/zsh-history-substring-search"
 
-zplug “plugins/git”,   from:oh-my-zsh
+# Use the package as a command
+# And accept glob patterns (e.g., brace, wildcard, ...)
+zplug "Jxck/dotfiles", as:command, use:"bin/{histuniq,color}"
 
-zplug “lib/clipboard”, from:oh-my-zsh, if:“[[ $OSTYPE == *darwin* ]]”
+# Can manage everything e.g., other person's zshrc
+zplug "tcnksm/docker-alias", use:zshrc
 
-zplug “rimraf/k”
-#zplug “b4b4r07/enhancd”, use:init.sh
-zplug ‘plugins/git-prune’, from:oh-my-zsh
-#zplug “AlexisBRENON/oh-my-zsh-reminder”
-zplug “RobertAudi/tsm”
-zplug “gko/ssh-connect”
+# Disable updates using the "frozen" tag
+zplug "k4rthik/git-cal", as:command, frozen:1
 
-zplug “molovo/revolver”, \
-      as:command, \
-      use:revolver
+# Supports oh-my-zsh plugins and the like
+zplug "plugins/git",   from:oh-my-zsh
 
-zplug “stedolan/jq”, \
-      from:gh-r, \
-      as:command, \
-      rename-to:jq
-zplug “b4b4r07/emoji-cli”, \
-      on:“stedolan/jq”
+# Also prezto
+zplug "modules/prompt", from:prezto
 
-zplug “uvaes/fzf-marks”
+# Run a command after a plugin is installed/updated
+# Provided, it requires to set the variable like the following:
+# ZPLUG_SUDO_PASSWORD="********"
+zplug "jhawthorn/fzy", \
+    as:command, \
+    rename-to:fzy, \
+    hook-build:"make && sudo make install"
 
-# Syntax highlighting for commands, load last
-#zplug “themes/agnoster”, from:oh-my-zsh, as:theme
-#zplug “NelsonBrandao/absolute”, as:theme
-#zplug “eendroroy/alien-minimal”, as:theme
-#zplug “stanleysq/aplos”, as:theme
-#zplug “eli-oat/bashi”, from:github, as:theme
-setopt prompt_subst # Make sure prompt is able to be generated properly.
-#zplug “caiogondim/bullet-train.zsh”, use:bullet-train.zsh-theme, defer:3
-#zplug “cusxio/delta-prompt”, use:delta.zsh
-#zplug “molovo/filthy”, as:theme
-#zplug “geometry-zsh/geometry”
-#zplug “subnixr/minimal”
-#zplug “LasaleFamine/phi-zsh-theme”
+# Supports checking out a specific branch/tag/commit
+zplug "b4b4r07/enhancd", at:v1
+zplug "mollifier/anyframe", at:4c23cb60
 
-#zplug “denysdovhan/spaceship-zsh-theme”, use:spaceship.zsh, from:github, as:theme
+# Can manage gist file just like other packages
+zplug "b4b4r07/79ee61f7c140c63d2786", \
+    from:gist, \
+    as:command, \
+    use:get_last_pane_path.sh
+
+# Rename a command with the string captured with `use` tag
+zplug "b4b4r07/httpstat", \
+    as:command, \
+    use:'(*).sh', \
+    rename-to:'$1'
+
+# Group dependencies
+# Load "emoji-cli" if "jq" is installed in this example
+zplug "stedolan/jq", \
+    from:gh-r, \
+    as:command, \
+    rename-to:jq
+zplug "b4b4r07/emoji-cli", \
+    on:"stedolan/jq"
+# Note: To specify the order in which packages should be loaded, use the defer
+#       tag described in the next section
+
+# Set the priority when loading
+# e.g., zsh-syntax-highlighting must be loaded
+# after executing compinit command and sourcing other plugins
+# (If the defer tag is given 2 or above, run after compinit command)
+zplug "zsh-users/zsh-syntax-highlighting", defer:2
+
+# Can manage local plugins
+zplug "~/.zsh", from:local
+
+# Load theme file
+zplug "denysdovhan/spaceship-prompt", use:spaceship.zsh, from:github, as:theme
+
+source ~/.zplug/init.zsh
+
+export HISTFILE=~/.zsh_history # Where it gets saved
+export HISTSIZE=10000
+export SAVEHIST=10000
+setopt append_history # Don't overwrite, append!
+setopt INC_APPEND_HISTORY # Write after each command
+setopt hist_expire_dups_first # Expire duplicate entries first when trimming history.
+setopt hist_fcntl_lock # use OS file locking
+setopt hist_ignore_all_dups # Delete old recorded entry if new entry is a duplicate.
+setopt hist_lex_words # better word splitting, but more CPU heavy
+setopt hist_reduce_blanks # Remove superfluous blanks before recording entry.
+setopt hist_save_no_dups # Don't write duplicate entries in the history file.
+setopt share_history # share history between multiple shells
+setopt HIST_IGNORE_SPACE # Don't record an entry starting with a space.
+
+export EDITOR=code
+
+export PATH="/usr/local/sbin:$PATH"
+
+### Pure prompt
 zplug mafredri/zsh-async, from:github
-#zplug sindresorhus/pure, use:pure.zsh, from:github, as:theme
+zplug sindresorhus/pure, use:pure.zsh, from:github, as:theme
 
-zplug “geometry-zsh/geometry”
+zplug "psprint/zsh-navigation-tools"
+autoload znt-history-widget
+zle -N znt-history-widget
+bindkey "^R" znt-history-widget
 
-#zplug carloscuesta/materialshell, use:materialshell, from:github, as:theme
-zplug “zsh-users/zsh-syntax-highlighting”, from:github, defer:3
-# Theme!
-#zplug “sindresorhus/pure”, use:pure.zsh, from:github, as:theme
+zplug "zsh-users/zsh-autosuggestions"
+if zplug check zsh-users/zsh-autosuggestions; then
+  ZSH_AUTOSUGGEST_CLEAR_WIDGETS+=(history-substring-search-up history-substring-search-down) # Add history-substring-search-* widgets to list of widgets that clear the autosuggestion
+  ZSH_AUTOSUGGEST_CLEAR_WIDGETS=("${(@)ZSH_AUTOSUGGEST_CLEAR_WIDGETS:#(up|down)-line-or-history}") # Remove *-line-or-history widgets from list of widgets that clear the autosuggestion to avoid conflict with history-substring-search-* widgets
+fi
+
+zplug "zsh-users/zsh-syntax-highlighting"
+
+zplug "zsh-users/zsh-history-substring-search"
+if zplug check zsh-users/zsh-history-substring-search; then
+  zmodload zsh/terminfo
+  bindkey "$terminfo[cuu1]" history-substring-search-up
+  bindkey "$terminfo[cud1]" history-substring-search-down
+fi
+
+zplug "rupa/z", use:z.sh
+
+# k
+# Directory listings for zsh with git features.
+# https://github.com/supercrabtree/k
+zplug 'supercrabtree/k'
+
+# alias-tips
+# Reminds you of aliases you have already.
+# https://github.com/djui/alias-tips
+zplug 'djui/alias-tips'
+
+
+#zplug 'chisui/zsh-nix-shell', from:github
+
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+
+
+if ! zplug check --verbose; then
+    printf "Install? [y/N]: "
+    if read -q; then
+        echo; zplug install
+    fi
+fi
+
+# zplug load --verbose
+zplug load
+autoload bashcompinit
+bashcompinit
+
+## Colorize the ls output ##
+alias ls='ls -G'
+
+## Use a long listing format ##
+alias ll='ls -la'
+
+## Show hidden files ##
+alias l.='ls -d .* --color=auto'
+
+export GOROOT=/usr/local/go
+export GOPATH=$HOME/Developer/go
+export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
+
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+fpath+=${ZDOTDIR:-~}/.zsh_functions
+export GITEDITOR=emacs
+export EDITOR=emacs
 
 if ! zplug check --verbose; then
     printf “Install? [y/N]: ”
@@ -74,26 +177,18 @@ zplug load
 
 
 # User configuration
-. ~/.dotfiles/scripts/env.sh
 source ~/.profile
-
-export NVM_DIR=“$HOME/.nvm”
-[ -s “$NVM_DIR/nvm.sh” ] && \. “$NVM_DIR/nvm.sh”  # This loads nvm
-[ -s “$NVM_DIR/bash_completion” ] && \. “$NVM_DIR/bash_completion”  # This loads nvm bash_completion
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 export PATH=“$HOME/.rbenv/bin:$PATH”
-eval “$(rbenv init -)”
 
 # added by Miniconda3 installer
 export PATH=“/Users/naren/Developer/tezos:/Users/naren/.miniconda3/bin:$PATH”
 
-# tabtab source for electron-forge package
-# uninstall by removing these lines or running `tabtab uninstall electron-forge`
-[[ -f /Users/naren/Developer/js/ipfs-desktop/node_modules/tabtab/.completions/electron-forge.zsh ]] && . /Users/naren/Developer/js/ipfs-desktop/node_modules/tabtab/.completions/electron-forge.zsh
-
 work() {
-   sshfs $WORK:Developer ~/Work/Developer
+   sshfs $WORK:Developer ~/$WORK/Developer
    ssh -XC $WORK
 }
+
+neofetch
